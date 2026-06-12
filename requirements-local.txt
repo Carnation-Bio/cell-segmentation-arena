@@ -1,0 +1,13 @@
+# OPTIONAL local-run path (cookers only). Lets you run the small/medium models
+# (cyto3, cpsam_v2, Omnipose) on your own Colab/local GPU instead of the backend,
+# via segment(..., backend="local"). NOT needed for the golden path.
+#
+#   pip install -r requirements-local.txt
+#
+# SAM-3 and all fine-tuning stay remote (Modal) regardless — they need >laptop VRAM.
+-r requirements.txt
+torch>=2.2
+cellpose>=4.0
+omnipose>=1.0
+packaging          # cellpose's fastremap dep imports this; fresh envs miss it
+onnxruntime>=1.17

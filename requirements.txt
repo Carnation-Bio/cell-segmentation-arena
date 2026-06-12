@@ -1,0 +1,9 @@
+# Participant default install — tiny, pure-Python, no compilation.
+# This is everything the golden path needs. Heavier optional deps for the
+# local-run path live in requirements-local.txt (kept out of the default).
+requests>=2.31
+numpy>=1.24
+pillow>=10.0
+scikit-image>=0.22
+matplotlib>=3.7
+jupyter-bbox-widget>=0.6

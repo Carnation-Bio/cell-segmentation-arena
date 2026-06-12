@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+tokens/tokens.txt
+tokens/*.private.*
+
+# Internal prep + dev tooling — not for the public repo (carry tokens or internal notes)
+docs/participant-guide-brief.md
+docs/workshop-findings.md
+backend/_*.py
+backend/tune_params.py
+notebook/_golden_executed.ipynb
+notebook/_golden_tmp.ipynb
+notebook/_verify_golden.py
+
+# Data artifacts (built by data_prep, never committed)
+data/
+*.tif
+*.tiff
+*.npy
+*.npz
+livecell_cache/
+
+# Modal / build
+.modal/
+
+# OS
+.DS_Store

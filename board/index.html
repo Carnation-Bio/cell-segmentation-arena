@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dense Cell Segmentation Arena — Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #0b0c0f; --panel: #141619; --panel2: #1c1e22; --line: #2a2c30;
+    --fg: #ecebe7; --muted: #a9a79f; --faint: #6f6d66;
+    --accent: #56b6c2; --gold: #e0a96d; --good: #7bbf8a; --warn: #e06c5a;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); padding: 40px 28px; }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  h1 { font-size: 26px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  h1 .sub { color: var(--muted); font-weight: 400; font-size: 15px; }
+  .status { color: var(--muted); font-size: 13px; font-family: var(--mono); }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--good); margin-right: 7px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+  .reveal-banner { margin: 20px 0 0; padding: 13px 18px; border-radius: 10px; background: rgba(224,169,109,.12); color: var(--gold); border: 1px solid rgba(224,169,109,.3); font-weight: 500; letter-spacing: .3px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  th, td { text-align: left; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .8px; }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+  .rank { color: var(--faint); width: 52px; font-family: var(--mono); }
+  .team { font-weight: 500; }
+  .map { color: var(--accent); font-weight: 500; }
+  .priv { color: var(--gold); font-weight: 500; }
+  .top1 .team { color: var(--gold); }
+  tr.moved { animation: flash 1s ease; }
+  @keyframes flash { from { background: rgba(86,182,194,.12); } to { background: transparent; } }
+  .empty { color: var(--faint); padding: 44px 0; text-align: center; }
+  .metrics { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .metric { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .metric .name { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+  .metric .name.gold { color: var(--gold); }
+  .metric .what { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-top: 7px; }
+  footer { color: var(--faint); font-size: 12px; margin-top: 18px; line-height: 1.6; }
+  @media (max-width: 620px) { .metrics { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Dense Cell Segmentation Arena <span class="sub">— SHSY5Y / LIVECell</span></h1>
+    <div class="status"><span class="dot"></span><span id="status">connecting…</span></div>
+  </header>
+  <div id="reveal" class="reveal-banner" style="display:none"></div>
+  <table>
+    <thead id="thead"></thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="name">mAP@[0.5:0.95]</div>
+      <div class="what">The board is ranked by this. It checks how well each predicted cell overlaps a
+        real one, at cutoffs from 50% to 95%, and averages them. A high score means you found
+        <em>every</em> cell and outlined it closely. Runs 0 to 1.</div>
+    </div>
+    <div class="metric">
+      <div class="name gold">F1@0.5</div>
+      <div class="what">A simpler number, at a single 50% overlap cutoff: how many of your cells are
+        right, balanced against how many real cells you found. Easier to read than mAP, but mAP is
+        what ranks you.</div>
+    </div>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+<script>
+  const params = new URLSearchParams(location.search);
+  const reveal = params.get("reveal");
+  const boardUrl = "/board" + (reveal ? "?reveal=" + encodeURIComponent(reveal) : "");
+  let prevRank = {};
+  const medal = (i) => ["🥇","🥈","🥉"][i] || (i + 1);
+  const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c]));
+
+  async function tick() {
+    let data;
+    try { data = await (await fetch(boardUrl, { cache: "no-store" })).json(); }
+    catch (e) { document.getElementById("status").textContent = "reconnecting…"; return; }
+    const revealed = data.revealed;
+    document.getElementById("status").textContent =
+      `${data.rows.length} teams · ${data.n_public_frames} public / ${data.n_private_frames} private frames · live`;
+
+    const banner = document.getElementById("reveal");
+    if (revealed) { banner.style.display = "block"; banner.textContent = "🏁 FINAL — Private Leaderboard (hidden test set)"; }
+    else banner.style.display = "none";
+
+    document.getElementById("thead").innerHTML = revealed
+      ? `<tr><th class="rank">#</th><th>Team</th><th class="num">Private mAP</th><th class="num">Private F1</th><th class="num">Public mAP</th><th class="num">Subs</th></tr>`
+      : `<tr><th class="rank">#</th><th>Team</th><th class="num">mAP@[.5:.95]</th><th class="num">F1@0.5</th><th class="num">Subs</th></tr>`;
+
+    const rows = document.getElementById("rows");
+    rows.innerHTML = "";
+    if (!data.rows.length) rows.innerHTML = `<tr><td colspan="6" class="empty">No submissions yet — be the first on the board.</td></tr>`;
+    data.rows.forEach((r, i) => {
+      const tr = document.createElement("tr");
+      if (i === 0) tr.className = "top1";
+      if (prevRank[r.team] !== undefined && prevRank[r.team] !== i) tr.classList.add("moved");
+      prevRank[r.team] = i;
+      tr.innerHTML = revealed
+        ? `<td class="rank">${medal(i)}</td><td class="team">${esc(r.team)}</td>
+           <td class="num priv">${r.private.toFixed(4)}</td><td class="num">${r.private_f1.toFixed(4)}</td>
+           <td class="num">${r.public.toFixed(4)}</td><td class="num">${r.n_subs}</td>`
+        : `<td class="rank">${medal(i)}</td><td class="team">${esc(r.team)}</td>
+           <td class="num map">${r.public.toFixed(4)}</td><td class="num">${r.public_f1.toFixed(4)}</td>
+           <td class="num">${r.n_subs}</td>`;
+      rows.appendChild(tr);
+    });
+    document.getElementById("foot").textContent =
+      "Higher is better. The public score updates live; the private board, scored on a hidden set of frames, decides the winner. Tune for a real score, not the public one. Refreshes every 6 seconds.";
+  }
+  tick();
+  setInterval(tick, 6000);
+</script>
+</body>
+</html>
