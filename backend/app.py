@@ -347,7 +347,7 @@ def _team_for_token(token: str | None) -> str:
 @app.function(
     image=web_image,
     secrets=[tokens_secret],
-    timeout=600,
+    timeout=1800,  # /finetune holds the request open while training runs synchronously
     min_containers=int(os.environ.get("ARENA_WARM_WEB", "0")),
 )
 @modal.concurrent(max_inputs=20)
@@ -394,6 +394,11 @@ def web():
     @api.get("/health")
     def health():
         return {"ok": True, "models": sorted(ALL_MODELS)}
+
+    @api.get("/whoami")
+    def whoami(authorization: str | None = Header(default=None)):
+        """Cheap token check for the notebook Setup cell: 200 + team if valid, 401 if not."""
+        return {"team": _team(authorization)}
 
     @api.post("/segment")
     def segment(req: SegmentRequest, authorization: str | None = Header(default=None)):

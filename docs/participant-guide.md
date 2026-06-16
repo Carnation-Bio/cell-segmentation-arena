@@ -5,9 +5,8 @@ notebook pulls in the toolkit itself.
 
 ## Run it on any computer (Colab)
 
-1. Open the notebook: click the **Open in Colab** badge in the [README](../README.md),
-   or [download it](https://carnation-workshop--cell-arena-leaderboard-web.modal.run/data/workshop.ipynb)
-   and in Colab do *File → Upload notebook*.
+1. [Download the notebook](https://carnation-workshop--cell-arena-leaderboard-web.modal.run/data/workshop.ipynb),
+   then in Colab do *File → Upload notebook*.
 2. Paste your token (and a team name) into the first cell.
 3. **Runtime → Run all.** You're on the leaderboard.
 

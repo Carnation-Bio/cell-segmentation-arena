@@ -22,6 +22,8 @@ tokens/tokens.txt
 tokens/*.private.*
 
 # Internal prep + dev tooling — not for the public repo (carry tokens or internal notes)
+# operator-only: regenerates the hidden GT — must not ship in the public repo
+data_prep/
 docs/participant-guide-brief.md
 docs/workshop-findings.md
 backend/_*.py

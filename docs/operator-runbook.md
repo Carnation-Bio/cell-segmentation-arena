@@ -9,7 +9,9 @@ environment) plus three Modal volumes; participants only ever touch the notebook
 # 0. deps for the build/deploy tooling
 uv venv --python 3.11 .venv && uv pip install -e ".[dev]" modal remotezip
 
-# 1. build the dataset (pulls dense SHSY5Y from LIVECell, makes the seed-1234 split)
+# 1. build the dataset (pulls dense SHSY5Y from LIVECell, makes the seed-1234 split).
+#    data_prep/ is operator-only and gitignored (not in the public repo): it
+#    regenerates the hidden GT, so it must stay off the clone path.
 python -m data_prep.build_dataset --out data/build
 
 # 2. push the hidden GT + the participant bundle to Modal volumes
@@ -34,6 +36,11 @@ python tokens/generate_tokens.py --push
 export ARENA_HF_SECRET=carnation-hf ARENA_HF_SECRET_ENV=main
 modal deploy -e workshop backend/app.py          # segment + finetune
 modal deploy -e workshop backend/leaderboard.py  # board + submit + data
+
+# REQUIRED after any notebook or toolkit change — otherwise participants download a
+# stale notebook. Rebuilds workshop.ipynb from source + pushes it (and the wheel):
+just notebook
+just host-toolkit
 ```
 
 Always deploy with a Python >=3.10 `modal` (use `.venv/bin/modal`) — see the note

@@ -1,4 +1,3 @@
-<!-- Colab badge target is wired up in the Build-order polish step. -->
 # Dense Cell Segmentation Arena
 
 A 2-hour, hands-on **competition workshop**. Teams race on a Kaggle-style
@@ -27,8 +26,8 @@ the notebook's first cell pulls in the tiny toolkit itself. You only need your
 team token.
 
 **Colab — works on any computer (recommended):**
-Click the badge above (or [download the notebook](https://carnation-workshop--cell-arena-leaderboard-web.modal.run/data/workshop.ipynb)
-and in Colab do *File → Upload notebook*), paste your token, **Run all**. Nothing
+[Download the notebook](https://carnation-workshop--cell-arena-leaderboard-web.modal.run/data/workshop.ipynb),
+then in Colab do *File → Upload notebook*, paste your token, **Run all**. Nothing
 to install locally.
 
 **Local — if you already have Jupyter:**
@@ -41,7 +40,7 @@ installs the toolkit into your kernel (stock Python 3.9+ is fine). No clone, no
 Clone it and point your Claude Code / Codex agent at [`AGENTS.md`](AGENTS.md):
 
 ```bash
-git clone https://github.com/owenauch/cell-segmentation-arena && cd cell-segmentation-arena
+git clone https://github.com/Carnation-Bio/cell-segmentation-arena && cd cell-segmentation-arena
 uv venv --python 3.11 && uv pip install -e .     # or any Python >=3.9 + pip install -e .
 export ARENA_TOKEN=wksp_teamNN_xxxx
 ```
@@ -55,7 +54,6 @@ export ARENA_TOKEN=wksp_teamNN_xxxx
 | `notebook/workshop.ipynb` | The participant notebook (golden path + the cooker ladder). |
 | `arena/` | Participant toolkit: `segment`, `finetune`, `score_local`, `submit`, viz, processing. |
 | `backend/` | Modal GPU apps (SAM 3 + Cellpose + Omnipose inference, LoRA fine-tune, leaderboard). |
-| `data_prep/` | Builds the LIVECell dense-SHSY5Y split (hidden GT stays server-side). |
 | `board/` | Static live leaderboard page. |
 | `tokens/` | Team-token generation. |
 
