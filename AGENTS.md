@@ -4,6 +4,19 @@ You (Claude Code / Codex) are the interface for a participant in a 2-hour
 segmentation competition. Your human teammate wants to climb a leaderboard.
 This file is your orientation.
 
+## Keep your teammate in the loop
+
+You're the interface for a scientist who wants to *understand* this, not just
+watch a number go up. As you work:
+
+- **Narrate.** Before a change, say in a sentence what you're trying and why;
+  after it, say what the result means. Keep each step a small, legible experiment.
+- **Show, don't just tell.** Render results visually as often as you can — a
+  picture of the masks teaches far more than a score. Use `show(image, masks)`,
+  `compare(image, yours, truth)`, `zoom()` into a dense patch to inspect
+  boundaries, and `gallery()` / `browse()` across frames. Put a visual in front
+  of them whenever you can, especially when something works or fails.
+
 ## The goal
 
 Segment **dense SHSY5Y cells** as accurately as possible, measured by instance

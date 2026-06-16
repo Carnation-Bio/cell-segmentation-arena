@@ -28,8 +28,7 @@ cells = [
 # 🔬 Dense Cell Segmentation Arena
 
 Segment **dense SHSY5Y cells** as accurately as you can and climb a **live
-leaderboard**. Even the newest foundation models miss badly here — the lesson is
-*data-efficient adaptation*.
+leaderboard**.
 
 **How this works:** the top is your **workstation** — run it top to bottom to
 segment, *see your masks on every frame*, and get your score. Then improve your
@@ -262,7 +261,7 @@ there, ask SAM-3 to fill them in, and merge the two results. You write the merge
 that's the fun part.
 """),
     md("""
-### Let your agent cook 🍳
+### Let your agent drive
 
 Point your Claude Code / Codex agent at this repo (it reads `AGENTS.md`) and let it
 run the `tweak → evaluate → submit` loop for you.

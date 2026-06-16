@@ -1,4 +1,4 @@
-# OPTIONAL local-run path (cookers only). Lets you run the small/medium models
+# OPTIONAL local-run path (power users only). Lets you run the small/medium models
 # (cyto3, cpsam_v2, Omnipose) on your own Colab/local GPU instead of the backend,
 # via segment(..., backend="local"). NOT needed for the golden path.
 #

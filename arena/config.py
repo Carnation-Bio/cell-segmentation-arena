@@ -8,7 +8,7 @@ data URLs default to the workshop's deployed services, so::
 
 is enough. Everything is overridable by env var (``ARENA_TOKEN``,
 ``ARENA_BACKEND_URL``, ``ARENA_LEADERBOARD_URL``, ``ARENA_DATA_URL``) for the
-cookers running outside the notebook.
+power users running outside the notebook.
 """
 
 from __future__ import annotations

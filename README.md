@@ -16,7 +16,7 @@ model with a *handful of labels* instead of training from scratch.
 
 - **Clear (everyone, zero code):** open the notebook, **Run All**, land on the
   leaderboard, beat the out-of-the-box baseline.
-- **Reach (cookers):** annotate a few frames, chain scikit-image processing,
+- **Reach (power users):** annotate a few frames, chain scikit-image processing,
   fine-tune an adapter, bring your own algorithm — and top the *private* board.
 
 ## Run it
@@ -36,7 +36,7 @@ open it in your Jupyter (`jupyter lab workshop.ipynb`), **Run all**. Cell 1
 installs the toolkit into your kernel (stock Python 3.9+ is fine). No clone, no
 `git`, no `uv`.
 
-**Cookers / agents — work from the repo:**
+**Power users and agents — work from the repo:**
 Clone it and point your Claude Code / Codex agent at [`AGENTS.md`](AGENTS.md):
 
 ```bash
@@ -51,7 +51,7 @@ export ARENA_TOKEN=wksp_teamNN_xxxx
 
 | Path | What |
 |------|------|
-| `notebook/workshop.ipynb` | The participant notebook (golden path + the cooker ladder). |
+| `notebook/workshop.ipynb` | The participant notebook (golden path + the power-user ladder). |
 | `arena/` | Participant toolkit: `segment`, `finetune`, `score_local`, `submit`, viz, processing. |
 | `backend/` | Modal GPU apps (SAM 3 + Cellpose + Omnipose inference, LoRA fine-tune, leaderboard). |
 | `board/` | Static live leaderboard page. |
