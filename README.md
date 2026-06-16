@@ -21,31 +21,27 @@ model with a *handful of labels* instead of training from scratch.
 
 ## Run it
 
-The models run on a remote GPU backend, so you need **no GPU and no install** —
-the notebook's first cell pulls in the tiny toolkit itself. You only need your
-team token.
-
-**Colab — works on any computer (recommended):**
-[Download the notebook](https://carnation-workshop--cell-arena-leaderboard-web.modal.run/data/workshop.ipynb),
-then in Colab do *File → Upload notebook*, paste your token, **Run all**. Nothing
-to install locally.
-
-**Local — if you already have Jupyter:**
-[Download the notebook](https://carnation-workshop--cell-arena-leaderboard-web.modal.run/data/workshop.ipynb),
-open it in your Jupyter (`jupyter lab workshop.ipynb`), **Run all**. Cell 1
-installs the toolkit into your kernel (stock Python 3.9+ is fine). No clone, no
-`git`, no `uv`.
-
-**Power users and agents — work from the repo:**
-Clone it and point your Claude Code / Codex agent at [`AGENTS.md`](AGENTS.md):
+**Recommended setup (works everywhere) — clone the repo and make an environment:**
 
 ```bash
 git clone https://github.com/Carnation-Bio/cell-segmentation-arena && cd cell-segmentation-arena
-uv venv --python 3.11 && uv pip install -e .     # or any Python >=3.9 + pip install -e .
-export ARENA_TOKEN=wksp_teamNN_xxxx
+uv venv --python 3.11 && uv pip install -e .     # or any Python 3.9+: python -m venv .venv && .venv/bin/pip install -e .
+export ARENA_TOKEN=wksp_teamNN_xxxx              # your team token
 ```
 
-(`uv`/`just` are conveniences for this path only — participants don't need them.)
+Then pick one:
+
+- **Drive it with Claude Code / Codex (recommended):** point your agent at the repo
+  and say *"Read AGENTS.md, get me set up, and get my first leaderboard score, then
+  let's improve it."* It reads [`AGENTS.md`](AGENTS.md) and takes it from there.
+- **Run the notebook from the repo:** `uv pip install jupyterlab ipywidgets`, then
+  `uv run jupyter lab notebook/workshop.ipynb`, paste your token, **Run all**.
+
+**Just want to open the notebook?**
+[Download it](https://carnation-workshop--cell-arena-leaderboard-web.modal.run/data/workshop.ipynb)
+and **Run all** in a Jupyter that has `pip` (Cell 1 installs the toolkit, stock
+Python 3.9+ is fine). If your Jupyter has no pip — e.g. installed via `uv tool` —
+use the repo setup above instead.
 
 ## Repo layout
 

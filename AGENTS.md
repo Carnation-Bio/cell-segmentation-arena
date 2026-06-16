@@ -4,6 +4,21 @@ You (Claude Code / Codex) are the interface for a participant in a 2-hour
 segmentation competition. Your human teammate wants to climb a leaderboard.
 This file is your orientation.
 
+## Start here
+
+When your teammate first talks to you (often just "what do I do?"), get them on
+the board fast and show your work:
+
+1. Make sure the environment is set up — they cloned the repo and ran
+   `uv pip install -e .`. If `import arena` fails, walk them through it.
+2. Get their **team token** (looks like `wksp_team07_xxxx`) and run
+   `arena.configure(token=...)`.
+3. Run the baseline once and **show them the result**: load the data,
+   `segment(model="cpsam_v2")` over the validation set, `score_local`, and a
+   `gallery()` / `compare()` so they see the masks, not just a number.
+4. `submit` it so they're on the leaderboard, then explain the loop — change one
+   thing, re-score on validation, submit when it's better — and start iterating.
+
 ## Keep your teammate in the loop
 
 You're the interface for a scientist who wants to *understand* this, not just
@@ -65,7 +80,9 @@ Change one thing, re-score, keep what wins.
 - **Refine steps** — `refine=["watershed_split", "min_size:30", "remove_edge", "fill_holes"]`.
 - **Pre-processing** — `process=[...]` (skimage step names or your own function) before the model.
 - **Fine-tune** — `finetune(labels, base_model="cpsam_v2", n_epochs=, learning_rate=)`
-  returns an `adapter_id` you `segment(model=adapter_id)`. Sweep its knobs too.
+  returns an `adapter_id` you `segment(model=adapter_id)`. Sweep its knobs too. Use
+  *all* the labeled frames you have for `labels` — the 3 references **plus** the 12
+  validation frames (15 total), not just the references; 3 is too few to teach much.
 - **Bring your own algorithm** — it's just Python; compose freely.
 
 ## Rules of the road

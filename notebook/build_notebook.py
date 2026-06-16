@@ -40,21 +40,23 @@ you're happy.
 """),
     md("# 🛠️ Workstation  ·  run these top to bottom"),
     code(f"""
-# 1) Setup — installs/updates the toolkit if needed (fresh machine, Colab, anywhere).
-#    First run ~20s. If it asks you to restart the kernel, do it once, then re-run.
+# 1) Setup. With the repo environment set up (uv pip install -e .) this just
+#    imports the toolkit. If you only downloaded the notebook, it installs it for
+#    you — as long as your Jupyter has pip.
+import importlib.util
 import sys
 
-def _toolkit_too_old():
-    try:
-        from importlib.metadata import version
-        return tuple(int(x) for x in version("cell-arena").split(".")[:3]) < {_VTUPLE}
-    except Exception:
-        return True   # not installed
-
-if _toolkit_too_old():
-    %pip install -q --upgrade "{WHEEL_URL}"
-    if "arena" in sys.modules:   # an old copy is already loaded -> a restart is required
-        raise SystemExit("✅ Toolkit updated. Now RESTART THE KERNEL (Kernel menu -> Restart), then run this cell again.")
+if importlib.util.find_spec("arena") is None:
+    if importlib.util.find_spec("pip") is not None:
+        %pip install -q --upgrade "{WHEEL_URL}"
+        if "arena" in sys.modules:   # an old copy was loaded -> restart needed
+            raise SystemExit("✅ Toolkit installed. Now RESTART THE KERNEL (Kernel menu -> Restart), then run this cell again.")
+    else:
+        raise SystemExit(
+            "The 'arena' toolkit isn't installed and this Jupyter has no pip. "
+            "Set up the repo environment first (see the README: git clone, then "
+            "uv venv --python 3.11 && uv pip install -e .), and launch Jupyter from it."
+        )
 
 import arena
 
@@ -178,6 +180,7 @@ adapter it returns. Runs on a GPU (a few minutes). `n_epochs` and
 `learning_rate` are yours to sweep:
 
 ```python
+# all 15 labeled frames you have: the 3 references + the 12 validation frames
 labels = [(img, lab) for (_id, img, lab) in references] + list(zip(val_images, val_labels))
 adapter = arena.finetune(labels, base_model="cpsam_v2", n_epochs=200, learning_rate=1e-5)
 
