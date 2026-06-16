@@ -17,10 +17,13 @@ show them what you're doing. Do not just keep going.**
   putting a picture in front of them and saying what you see. If you realize
   you've been heads-down for a while with nothing shown, stop right now and show
   them where things stand.
-- **Make it visual.** A picture of the masks teaches far more than a number. Use
-  `show(image, masks)`, `compare(image, yours, truth)`, `zoom()` into a dense
-  patch to inspect boundaries, and `gallery()` / `browse()` across frames. Show
-  the masks especially when something works or fails.
+- **Make it visual, and make sure it actually appears.** A picture of the masks
+  teaches far more than a number. `show(image, masks)`, `compare(image, yours, truth)`,
+  `zoom()` into a dense patch, and `gallery()` across frames all render the masks.
+  When you run them from a terminal (how you're driving), they don't just call a
+  no-op `plt.show()` — they **save a PNG and open it in the user's image viewer**,
+  and print the path. Use them constantly, and after each one tell the user to
+  look at the image that just opened.
 - **Narrate in plain language.** Before a change, say in a sentence what you're
   trying and why; after it, say what the result means.
 

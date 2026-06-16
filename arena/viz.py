@@ -7,11 +7,48 @@ at whether touching cells are split.
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+import tempfile
+import time
+
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.segmentation import find_boundaries
 
 Box = tuple[int, int, int, int]  # (row0, col0, row1, col1)
+
+
+def _in_notebook() -> bool:
+    """True only inside a Jupyter/IPython kernel, where plt renders inline."""
+    try:
+        from IPython import get_ipython
+
+        ip = get_ipython()
+        return ip is not None and "IPKernelApp" in ip.config
+    except Exception:
+        return False
+
+
+def _render() -> None:
+    """Display the current figure. Inline in a notebook; otherwise save a PNG and
+    open it in the OS image viewer, so an agent driving from a terminal or IDE
+    actually puts the picture in front of the user (plt.show shows nothing there)."""
+    if _in_notebook():
+        plt.show()
+        return
+    out = os.path.join(tempfile.gettempdir(), "arena_views")
+    os.makedirs(out, exist_ok=True)
+    path = os.path.join(out, f"view_{int(time.time() * 1000)}.png")
+    plt.savefig(path, dpi=120, bbox_inches="tight")
+    plt.close()
+    print(f"view saved and opened: {path}", flush=True)
+    opener = {"darwin": ["open"], "win32": ["cmd", "/c", "start", ""]}.get(sys.platform, ["xdg-open"])
+    try:
+        subprocess.Popen([*opener, path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
 
 
 def _colorize(masks: np.ndarray) -> np.ndarray:
@@ -75,7 +112,7 @@ def gallery(images, masks=None, labels=None, ncols: int = 4, max_frames: int = 1
         else:
             ax.axis("off")
     plt.tight_layout()
-    plt.show()
+    _render()
 
 
 def browse(images, masks=None, labels=None, panel_size: float = 8.0) -> None:
@@ -114,7 +151,7 @@ def browse(images, masks=None, labels=None, panel_size: float = 8.0) -> None:
             _draw(ax, img[crop], None if m is None else m[crop])
             ax.set_title(f"{title}    (frame {frame + 1}/{n}, zoom {zoom}×)", fontsize=11)
         plt.tight_layout()
-        plt.show()
+        _render()
 
     try:
         import ipywidgets as widgets
@@ -135,7 +172,7 @@ def show(image, masks=None, title: str | None = None, figsize=(9, 7)) -> None:
     n = 0 if masks is None else int(np.asarray(masks).max())
     ax.set_title(title or (f"{n} instances" if masks is not None else "image"))
     plt.tight_layout()
-    plt.show()
+    _render()
 
 
 def compare(image, mine, gt, figsize=(16, 6)) -> None:
@@ -148,7 +185,7 @@ def compare(image, mine, gt, figsize=(16, 6)) -> None:
     _draw(axes[2], image, gt)
     axes[2].set_title(f"ground truth — {int(np.asarray(gt).max())} cells")
     plt.tight_layout()
-    plt.show()
+    _render()
 
 
 def zoom(image, masks=None, box: Box | None = None, figsize=(9, 9)) -> None:
@@ -168,4 +205,4 @@ def zoom(image, masks=None, box: Box | None = None, figsize=(9, 9)) -> None:
     _draw(ax, crop_img, crop_mask, alpha=0.4)
     ax.set_title(f"zoom {box}")
     plt.tight_layout()
-    plt.show()
+    _render()
