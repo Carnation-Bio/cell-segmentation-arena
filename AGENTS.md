@@ -83,7 +83,11 @@ Change one thing, re-score, keep what wins.
   returns an `adapter_id` you `segment(model=adapter_id)`. Sweep its knobs too. Use
   *all* the labeled frames you have for `labels` — the 3 references **plus** the 12
   validation frames (15 total), not just the references; 3 is too few to teach much.
-- **Bring your own algorithm** — it's just Python; compose freely.
+- **Bring your own algorithm — go rogue.** It's just Python; you are not limited
+  to the toolkit. `pip install` anything you want (PyTorch, your own model, another
+  segmentation library), write a custom segmenter, ensemble several approaches.
+  `my_pipeline` only has to take an image and return an instance-label array — how
+  you get there is entirely up to you. Surprise your teammate.
 
 ## Rules of the road
 
