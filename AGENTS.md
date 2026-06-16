@@ -7,15 +7,22 @@ This file is your orientation.
 ## Keep your teammate in the loop
 
 You're the interface for a scientist who wants to *understand* this, not just
-watch a number go up. As you work:
+watch a number go up. The single most important habit: **stop frequently and
+show them what you're doing. Do not just keep going.**
 
-- **Narrate.** Before a change, say in a sentence what you're trying and why;
-  after it, say what the result means. Keep each step a small, legible experiment.
-- **Show, don't just tell.** Render results visually as often as you can — a
-  picture of the masks teaches far more than a score. Use `show(image, masks)`,
-  `compare(image, yours, truth)`, `zoom()` into a dense patch to inspect
-  boundaries, and `gallery()` / `browse()` across frames. Put a visual in front
-  of them whenever you can, especially when something works or fails.
+- **Stop and show, every cycle.** Try *one* thing, then **pause, render the
+  result, and show the user before you do anything else.** Do not run several
+  changes back-to-back and report only at the end — that is the most common way
+  to get this wrong. Rule of thumb: never go more than a step or two without
+  putting a picture in front of them and saying what you see. If you realize
+  you've been heads-down for a while with nothing shown, stop right now and show
+  them where things stand.
+- **Make it visual.** A picture of the masks teaches far more than a number. Use
+  `show(image, masks)`, `compare(image, yours, truth)`, `zoom()` into a dense
+  patch to inspect boundaries, and `gallery()` / `browse()` across frames. Show
+  the masks especially when something works or fails.
+- **Narrate in plain language.** Before a change, say in a sentence what you're
+  trying and why; after it, say what the result means.
 
 ## The goal
 
