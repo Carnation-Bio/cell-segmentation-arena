@@ -18,9 +18,12 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); padding: 40px 28px; }
   .wrap { max-width: 940px; margin: 0 auto; }
-  header { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
   h1 { font-size: 26px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   h1 .sub { color: var(--muted); font-weight: 400; font-size: 15px; }
+  .headright { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: flex-end; }
+  .getnb { color: var(--accent); text-decoration: none; font-size: 13px; font-family: var(--mono); border: 1px solid var(--line); padding: 7px 13px; border-radius: 8px; white-space: nowrap; transition: border-color .15s ease, color .15s ease; }
+  .getnb:hover { border-color: var(--accent); color: var(--fg); }
   .status { color: var(--muted); font-size: 13px; font-family: var(--mono); }
   .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--good); margin-right: 7px; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
@@ -51,7 +54,10 @@
 <div class="wrap">
   <header>
     <h1>Dense Cell Segmentation Arena <span class="sub">— SHSY5Y / LIVECell</span></h1>
-    <div class="status"><span class="dot"></span><span id="status">connecting…</span></div>
+    <div class="headright">
+      <a class="getnb" href="https://github.com/Carnation-Bio/cell-segmentation-arena/blob/main/notebook/workshop.ipynb" target="_blank" rel="noopener">↗ Get the notebook</a>
+      <div class="status"><span class="dot"></span><span id="status">connecting…</span></div>
+    </div>
   </header>
   <div id="reveal" class="reveal-banner" style="display:none"></div>
   <table>

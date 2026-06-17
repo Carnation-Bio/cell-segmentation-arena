@@ -10,6 +10,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 
@@ -26,9 +27,19 @@ def _read(rel: str) -> bytes:
     if not base:
         raise RuntimeError("no data_url set — call arena.configure(data_url=...)")
     if base.startswith(("http://", "https://")):
-        resp = requests.get(f"{base}/{rel}", timeout=120)
-        resp.raise_for_status()
-        return resp.content
+        # Many workshop machines hit the backend at once; transient connection
+        # breaks (IncompleteRead/ConnectionError) are expected — retry a few times.
+        url = f"{base}/{rel}"
+        last: Exception | None = None
+        for attempt in range(4):
+            try:
+                resp = requests.get(url, timeout=120)
+                resp.raise_for_status()
+                return resp.content
+            except (requests.exceptions.ChunkedEncodingError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
+                last = exc
+                time.sleep(0.5 * (attempt + 1))
+        raise RuntimeError(f"failed to fetch {rel} after 4 tries: {last}")
     with open(os.path.join(base, rel), "rb") as fh:
         return fh.read()
 
@@ -55,23 +66,27 @@ def _map(fn, stems, workers: int = 8):
 
 def load_public_test() -> dict[str, np.ndarray]:
     """The test images to segment + submit. ``{image_id: image}`` (no labels)."""
+    print("downloading test images (a few MB)...", flush=True)
     stems = _manifest()["sets"]["test"]
     return dict(zip(stems, _map(_image, stems)))
 
 
 def load_train_frames() -> dict[str, np.ndarray]:
     """Raw training frames (no labels) for self-labeling / fine-tuning."""
+    print("downloading training frames...", flush=True)
     stems = _manifest()["sets"]["train"]
     return dict(zip(stems, _map(_image, stems)))
 
 
 def load_reference_frames() -> list[tuple[str, np.ndarray, np.ndarray]]:
     """The 3 fully-labeled reference frames: ``[(id, image, label), ...]``."""
+    print("downloading reference frames...", flush=True)
     stems = _manifest()["sets"]["reference"]
     return [(s, i, l) for s, i, l in zip(stems, _map(_image, stems), _map(_label, stems))]
 
 
 def load_local_val() -> tuple[list[np.ndarray], list[np.ndarray]]:
     """The labeled validation set for ``score_local``: ``(images, labels)``."""
+    print("downloading validation set...", flush=True)
     stems = _manifest()["sets"]["val"]
     return _map(_image, stems), _map(_label, stems)

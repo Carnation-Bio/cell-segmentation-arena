@@ -4,6 +4,9 @@
 MODAL := ".venv/bin/modal"
 ENV := "workshop"
 HF := "ARENA_HF_SECRET=carnation-hf ARENA_HF_SECRET_ENV=main"
+# Keep in sync with pyproject.toml + the notebook cell-1 install gate.
+VERSION := "0.3.1"
+WHEEL := "cell_arena-" + VERSION + "-py3-none-any.whl"
 
 default:
     @just --list
@@ -25,9 +28,9 @@ host-data:
     {{MODAL}} volume put -e {{ENV}} arena-gt data/build/server/private_gt.npz private_gt.npz --force
     cd data/build/bundle && ../../../{{MODAL}} volume put -e {{ENV}} arena-bundle . / --force
 
-# host the built wheel + notebook for download (run after `just notebook` / a version bump)
+# host the built wheel + notebook for download (run after a rebuild / version bump)
 host-toolkit:
-    {{MODAL}} volume put -e {{ENV}} arena-bundle dist/cell_arena-0.2.0-py3-none-any.whl cell_arena-0.2.0-py3-none-any.whl --force
+    {{MODAL}} volume put -e {{ENV}} arena-bundle dist/{{WHEEL}} {{WHEEL}} --force
     {{MODAL}} volume put -e {{ENV}} arena-bundle notebook/workshop.ipynb workshop.ipynb --force
 
 # generate team tokens and push the secret

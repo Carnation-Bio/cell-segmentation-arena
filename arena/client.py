@@ -52,6 +52,23 @@ def _listify(x):
     return np.asarray(x).tolist() if x is not None else None
 
 
+# When >0, a bulk call (run_pipeline/segment_all) is in flight and prints its own
+# progress, so individual segment() calls stay quiet instead of spamming per frame.
+_bulk_depth = 0
+
+
+class _Bulk:
+    """Suppress per-call ``segment`` chatter while a bulk runner drives it."""
+
+    def __enter__(self):
+        global _bulk_depth
+        _bulk_depth += 1
+
+    def __exit__(self, *exc):
+        global _bulk_depth
+        _bulk_depth -= 1
+
+
 def segment(
     image: np.ndarray | None = None,
     model: str = "sam3",
@@ -71,6 +88,10 @@ def segment(
     (e.g. ``["watershed_split", "min_size:30"]``) runs locally after. With
     ``backend="local"`` the small models run on your own GPU instead of Modal.
     """
+    if _bulk_depth == 0:
+        where = "your GPU" if backend == "local" else "the GPU backend"
+        print(f"segmenting one frame on {where} (a few seconds, not instant)...", flush=True)
+
     if backend == "local":
         from arena.local_models import segment_local
 
@@ -117,7 +138,7 @@ def segment_all(
         key, img = item
         return key, segment(img, model=model, **kwargs)
 
-    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+    with _Bulk(), ThreadPoolExecutor(max_workers=max_workers) as pool:
         return dict(pool.map(one, images.items()))
 
 
@@ -136,7 +157,7 @@ def run_pipeline(pipeline, images: Mapping[str, np.ndarray], max_workers: int = 
         print(f"running your pipeline on {n} frames on the GPU backend "
               f"(~{max(3, n // 2)}s, not instant — hang tight)...", flush=True)
     out: dict = {}
-    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+    with _Bulk(), ThreadPoolExecutor(max_workers=max_workers) as pool:
         futures = {pool.submit(pipeline, images[k]): k for k in keys}
         for done, fut in enumerate(as_completed(futures), start=1):
             out[futures[fut]] = fut.result()
@@ -160,6 +181,9 @@ def finetune(labels: Iterable, base_model: str = "cpsam_v2", timeout: float = 12
     ``adapter_id`` usable as ``segment(model=adapter_id)``."""
     cfg = get_config()
     payload = {"base_model": base_model, "hyperparams": hyperparams, "labels": _encode_labels(labels)}
+    n = payload["labels"] and len(payload["labels"])
+    print(f"fine-tuning {base_model} on {n} labeled frame(s) on the GPU — this takes a few minutes, "
+          "leave it running...", flush=True)
     resp = requests.post(f"{cfg.backend_url}/finetune", json=payload, headers=_auth(), timeout=timeout)
     _raise(resp)
     adapter_id = resp.json()["adapter_id"]
@@ -170,6 +194,7 @@ def finetune(labels: Iterable, base_model: str = "cpsam_v2", timeout: float = 12
 def submit(pred_masks: Mapping[str, np.ndarray], team: str, timeout: float = 300) -> float:
     """Submit predictions for the test set; returns your live public score."""
     cfg = get_config()
+    print(f"scoring {len(pred_masks)} masks against the hidden test set...", flush=True)
     payload = {"team": team, "masks": encode_submission(pred_masks)}
     resp = requests.post(f"{cfg.leaderboard_url}/submit", json=payload, headers=_auth(), timeout=timeout)
     _raise(resp)
